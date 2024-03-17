@@ -27,6 +27,8 @@ dependencies {
 	implementation 'org.springframework.data:spring-data-mongodb'
 	implementation 'org.apache.commons:commons-io:1.3.2'
 	implementation 'com.squareup.okhttp3:okhttp:4.5.0'
+	implementation "org.springframework.boot:spring-boot-starter-security"
+
 	runtimeOnly 'com.h2database:h2'
 	runtimeOnly 'io.micrometer:micrometer-registry-prometheus'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
