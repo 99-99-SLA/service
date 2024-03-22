@@ -8,5 +8,5 @@ import ro.unibuc.hello.data.entity.UserEntity;
 
 public interface UserRepository extends MongoRepository <UserEntity, String> {
     Optional <UserEntity> findByUsername(String username);
-    Boolean existsByUsername();
+    Boolean existsByUsername(String username);
 }
