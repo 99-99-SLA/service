@@ -76,11 +76,9 @@ public class MovieService {
     }
 
     public void deleteMovie(String id) {
-        if (!movieRepository.existsById(id)) {
-            throw new EntityNotFoundException(String.format("movie (id = %s)", id));
-        }
+        final Movie movie = getMovieById(id);
         roleService.deleteRolesByMovieId(id);
-        movieRepository.deleteById(id);
+        movieRepository.delete(movie);
     }
 
     private Actor getActorOrAdd(ActorDto actorDto) {
