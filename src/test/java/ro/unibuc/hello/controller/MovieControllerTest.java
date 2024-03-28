@@ -16,26 +16,37 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import ro.unibuc.hello.data.entity.Movie;
+import ro.unibuc.hello.data.entity.Review;
 import ro.unibuc.hello.dto.tmdb.MovieApiDto;
+import ro.unibuc.hello.dto.tmdb.ReviewDto;
 import ro.unibuc.hello.exception.EntityNotFoundException;
 import ro.unibuc.hello.exception.MovieExceptionHandler;
 import ro.unibuc.hello.service.MovieService;
+import ro.unibuc.hello.service.ReviewService;
 
 import java.util.Collections;
 import java.util.List;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static ro.unibuc.hello.utils.TestUtils.buildTestMovie;
 import static ro.unibuc.hello.utils.TestUtils.buildTestMovieApiDto;
+import static ro.unibuc.hello.utils.TestUtils.buildTestReview;
+import static ro.unibuc.hello.utils.TestUtils.buildTestReviewDto;
 
 @ExtendWith(SpringExtension.class)
 class MovieControllerTest {
 
     @Mock
     private MovieService movieService;
+
+    @Mock
+    private ReviewService reviewService;
 
     @InjectMocks
     private MovieController movieController;
@@ -182,5 +193,66 @@ class MovieControllerTest {
         mockMvc.perform(delete("/movies/" + id)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound());
+    }
+
+
+    @Test
+    void testAddReviewSuccessful() throws Exception {
+        // Arrange
+        final String movieId = "1";
+        final ReviewDto reviewDto = buildTestReviewDto();
+        final Review review = buildTestReview();
+
+        when(reviewService.addReview(eq(movieId), any(ReviewDto.class))).thenReturn(review);
+
+        // Act & Assert
+        mockMvc.perform(post("/movies/" + movieId + "/reviews/add")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(reviewDto)))
+            .andExpect(status().isCreated())
+            .andExpect(content().json(objectMapper.writeValueAsString(review)));
+    }
+
+    @Test
+    void testAddReviewToNonExistentMovieThrowsNotFound() throws Exception {
+        // Arrange
+        final String movieId = "999";
+        final ReviewDto reviewDto = buildTestReviewDto();
+
+        when(reviewService.addReview(eq(movieId), any(ReviewDto.class))).thenThrow(new EntityNotFoundException("Movie not found"));
+
+        // Act & Assert
+        mockMvc.perform(post("/movies/" + movieId + "/reviews/add")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(reviewDto)))
+            .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void testGetMovieReviews() throws Exception {
+        // Arrange
+        final String movieId = "1";
+        final List<Review> reviews = Collections.singletonList(buildTestReview());
+
+        when(reviewService.getReviewsByMovieId(movieId)).thenReturn(reviews);
+
+        // Act & Assert
+        mockMvc.perform(get("/movies/" + movieId + "/reviews")
+                .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isOk())
+            .andExpect(content().json(objectMapper.writeValueAsString(reviews)));
+    }
+
+    @Test
+    void testGetMovieReviewsForNonExistentMovieThrowsNotFound() throws Exception {
+        // Arrange
+        final String movieId = "999";
+
+        when(reviewService.getReviewsByMovieId(movieId)).thenThrow(new EntityNotFoundException("Movie not found"));
+
+        // Act & Assert
+        mockMvc.perform(get("/movies/" + movieId + "/reviews")
+                .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isNotFound());
     }
 }

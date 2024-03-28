@@ -2,10 +2,16 @@ package ro.unibuc.hello.utils;
 
 import ro.unibuc.hello.data.entity.Actor;
 import ro.unibuc.hello.data.entity.Movie;
+import ro.unibuc.hello.data.entity.Review;
 import ro.unibuc.hello.dto.tmdb.ActorDto;
 import ro.unibuc.hello.dto.tmdb.CastDto;
 import ro.unibuc.hello.dto.tmdb.MovieApiDto;
 import ro.unibuc.hello.dto.tmdb.PagedApiResponseDto;
+import ro.unibuc.hello.dto.tmdb.ReviewDto;
+import ro.unibuc.hello.data.entity.Review;
+import ro.unibuc.hello.dto.tmdb.ReviewDto;
+
+import java.time.LocalDate;
 
 import java.util.List;
 
@@ -56,5 +62,24 @@ public class TestUtils {
 
     public static PagedApiResponseDto<MovieApiDto> buildTestMoviePagedApiResponseDto(MovieApiDto movieApiDto) {
         return new PagedApiResponseDto<>(1, List.of(movieApiDto), 1, 1);
+    }
+
+    public static Review buildTestReview() {
+        return Review.builder()
+                .id("1")
+                .movieId("1") // Assuming this is the ID of the movie the review is for
+                .username("User123")
+                .comment("An iconic movie that redefined its genre.")
+                .rating(9)
+                .build();
+    }
+
+    public static ReviewDto buildTestReviewDto() {
+        return ReviewDto.builder()
+                .username("User123")
+                .movieId("1") // This should match with the movie ID you're testing against
+                .rating(9)
+                .comment("An iconic movie that redefined its genre.")
+                .build();
     }
 }
