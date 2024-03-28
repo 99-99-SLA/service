@@ -14,11 +14,6 @@ public class ActorService {
     @Autowired
     private ActorRepository actorRepository;
 
-    public Actor getActorById(String id) {
-        return actorRepository.findById(id).orElseThrow(() ->
-                new EntityNotFoundException(String.format("actor (id = %s)", id)));
-    }
-
     public Optional<Actor> getActorByTmdbId(Long tmdbId) {
         return actorRepository.findByTmdbId(tmdbId);
     }

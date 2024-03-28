@@ -11,6 +11,7 @@ import org.springframework.stereotype.Component;
 import ro.unibuc.hello.dto.tmdb.CastDto;
 import ro.unibuc.hello.dto.tmdb.MovieApiDto;
 import ro.unibuc.hello.dto.tmdb.PagedApiResponseDto;
+import ro.unibuc.hello.exception.EntityNotFoundException;
 
 import java.io.IOException;
 
@@ -78,6 +79,9 @@ public class TheMovieDbClient {
         try (final Response response = client.newCall(request).execute()) {
             if (response.body() == null) {
                 throw new RuntimeException("Response body is null");
+            }
+            if (response.code() == 404) {
+                throw new EntityNotFoundException("Resource not found");
             }
             return response.body().string();
         } catch (IOException e) {
