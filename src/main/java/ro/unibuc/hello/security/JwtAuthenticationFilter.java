@@ -32,23 +32,26 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
         String token = getJwtFromCookie(request);
-        System.out.println("Found token: " + token);
+        // System.out.println("Found token: " + token);
         if(StringUtils.hasText(token) && tokenGenerator.validateToken(token)) {
             String username = tokenGenerator.getUsernameFromJWT(token);
-            System.out.println("Token is valid.");
-            System.out.println("Username in token: " + username);
-            //try {
+            
+            //System.out.println("Token is valid.");
+            //System.out.println("Username in token: " + username);
+
             UserDetails userDetails = customUserDetailsService.loadUserByUsername(username);
-            UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(userDetails, userDetails.getAuthorities());
+            UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
             authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
             SecurityContextHolder.getContext().setAuthentication(authenticationToken);
-            //}
+
             /*
-            catch(Exception err)
-            {
-                System.out.println(err);
-            } */
+            System.out.println("Username: {}" + userDetails.getUsername());
+            System.out.println("Authorities: {}" + userDetails.getAuthorities());
+            System.out.println("Authentication details: {}" + authenticationToken.getDetails());
+            */
+            
         }
+        //System.out.println("Ajunge pana la final");
         filterChain.doFilter(request, response);
     }
     

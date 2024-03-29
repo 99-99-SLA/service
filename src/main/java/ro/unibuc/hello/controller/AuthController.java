@@ -61,7 +61,8 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<AuthResponseDto> login(@RequestBody LoginDto loginDto, HttpServletResponse response) {
-        System.out.println("Se ajunge in endpoint /login");
+        
+        // System.out.println("Se ajunge in endpoint /login");
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
                     loginDto.getUsername(), loginDto.getPassword())
@@ -69,7 +70,7 @@ public class AuthController {
         SecurityContextHolder.getContext().setAuthentication(authentication);
         String token = jwtGenerator.generateToken(authentication);
         Cookie cookie = new Cookie("accessToken", token);
-        System.out.println("Generated token: " + token);
+        // System.out.println("Generated token: " + token);
         cookie.setPath("/");
         cookie.setHttpOnly(true);
 

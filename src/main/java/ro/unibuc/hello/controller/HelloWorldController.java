@@ -38,6 +38,7 @@ public class HelloWorldController {
     public String sayMyName(@RequestParam(name="name", required=false, defaultValue="Stranger") String name, Authentication authentication) {
         
         String loggedInUsername = authentication.getName();
-        return loggedInUsername;
+        // System.out.println("I am " + loggedInUsername);
+        return "I am " + loggedInUsername;
     }
 }
