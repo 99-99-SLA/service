@@ -1,6 +1,7 @@
 package ro.unibuc.hello.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -30,5 +31,13 @@ public class HelloWorldController {
     @ResponseBody
     public Greeting info(@RequestParam(name="title", required=false, defaultValue="Overview") String title) throws EntityNotFoundException {
         return helloWorldService.buildGreetingFromInfo(title);
+    }
+
+    @GetMapping("/hello-darkness")
+    @ResponseBody
+    public String sayMyName(@RequestParam(name="name", required=false, defaultValue="Stranger") String name, Authentication authentication) {
+        
+        String loggedInUsername = authentication.getName();
+        return loggedInUsername;
     }
 }
