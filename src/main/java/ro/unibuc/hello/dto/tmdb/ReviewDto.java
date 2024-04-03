@@ -1,7 +1,7 @@
 package ro.unibuc.hello.dto.tmdb;
 
-import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -16,9 +16,11 @@ import lombok.Setter;
 @NoArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Builder
-public class ActorDto {
-    @JsonAlias("id")
-    private Long tmdbId;
-
-    private String name;
+public class ReviewDto {
+    private String username;
+    private String movieId;
+    private int rating;
+    private String comment;
+    // No need for createdAt field since it will be set when saving the review.
 }
+
