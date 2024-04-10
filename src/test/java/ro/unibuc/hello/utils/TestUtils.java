@@ -10,6 +10,7 @@ import ro.unibuc.hello.dto.tmdb.PagedApiResponseDto;
 import ro.unibuc.hello.dto.tmdb.ReviewDto;
 import ro.unibuc.hello.data.entity.Review;
 import ro.unibuc.hello.dto.tmdb.ReviewDto;
+import ro.unibuc.hello.data.entity.UserEntity;
 
 import java.time.LocalDate;
 
@@ -82,4 +83,13 @@ public class TestUtils {
                 .comment("An iconic movie that redefined its genre.")
                 .build();
     }
+
+    public static UserEntity buildTestUser() {
+        UserEntity user = new UserEntity();
+        user.setId("1");
+        user.setUsername("exampleUser");
+        user.setPassword("examplePassword");
+        return user;
+    }
+    
 }
