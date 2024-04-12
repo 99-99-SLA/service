@@ -36,7 +36,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.boot.test.context.SpringBootTest.*;
 
 @CucumberContextConfiguration
-@SpringBootTest(webEnvironment= WebEnvironment.DEFINED_PORT)
+@SpringBootTest
 public class MovieSteps {
 
     public static ResponseResults latestResponse = null;
@@ -57,6 +57,8 @@ public class MovieSteps {
     @Autowired
     private MovieRepository movieRepository;
 
+    private static final String HOST = "http://host.docker.internal:8080";
+
     @Given("^the database is empty")
     public void setup() {
         roleRepository.deleteAll();
@@ -66,12 +68,12 @@ public class MovieSteps {
 
     @Given("^the client calls /hello-world")
     public void the_client_issues_GET_hello() {
-        executeGet("http://localhost:8080/hello-world");
+        executeGet(HOST + "/hello-world");
     }
 
     @When("^the client searches a movie with the query ((?:\\w+\\s?)+)")
     public void movieSearch(String query) {
-        executeGet("http://localhost:8080/movies/search?name=" + query);
+        executeGet(HOST + "/movies/search?name=" + query);
     }
 
     @And("^the client receives at least one result with the title ((?:\\w+\\s?)+)")
@@ -106,7 +108,7 @@ public class MovieSteps {
         try {
             final List<MovieApiDto> response = objectMapper.readValue(body, type);
             final MovieApiDto movieApiDto = response.get(0);
-            final String url = "http://localhost:8080/movies/" + movieApiDto.getTmdbId();
+            final String url = HOST + "/movies/" + movieApiDto.getTmdbId();
             executePost(url);
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
@@ -115,7 +117,7 @@ public class MovieSteps {
 
     @And("^the movie is saved in the database with the name ((?:\\w+\\s?)+)")
     public void movieIsSaved(String query) {
-        final String url = "http://localhost:8080/movies";
+        final String url = HOST + "/movies";
         executeGet(url);
         final String body = latestResponse.getBody();
         final JavaType type = objectMapper.getTypeFactory().constructParametricType(List.class, Movie.class);
@@ -144,7 +146,7 @@ public class MovieSteps {
 
     @When("^the client searches for the saved movie")
     public void executeFetchMovie() {
-        final String url = "http://localhost:8080/movies/" + movieId;
+        final String url = HOST + "/movies/" + movieId;
         executeGet(url);
     }
 
@@ -161,13 +163,13 @@ public class MovieSteps {
 
     @When("^the client deletes the saved movie")
     public void executeDeleteMovie() {
-        final String url = "http://localhost:8080/movies/" + movieId;
+        final String url = HOST + "/movies/" + movieId;
         executeDelete(url);
     }
 
     @And("^the movie is deleted from the database")
     public void movieIsDeleted() {
-        final String url = "http://localhost:8080/movies";
+        final String url = HOST + "/movies";
         executeGet(url);
         final String body = latestResponse.getBody();
         final JavaType type = objectMapper.getTypeFactory().constructParametricType(List.class, Movie.class);

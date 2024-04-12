@@ -1,12 +1,12 @@
 services:
   hello:
-    image: hello-img
-    build: .
+    image: 9999sla/hello-img:${IMAGE_TAG}
     ports:
       - 8080:8080
     environment:
       ENVIRONMENT_NAME: local
       MONGODB_CONECTION_URL: mongodb://root:example@mongo:27017/
+      TMDB_CONNECTION_TOKEN: ${TMDB_CONNECTION_TOKEN}
     restart: always
     profiles:
       - "hello-service"
@@ -20,9 +20,12 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
       - /usr/bin/docker:/usr/bin/docker
       - ./Dockerfile:/Dockerfile
+      - /usr/libexec/docker/cli-plugins/docker-compose:/usr/libexec/docker/cli-plugins/docker-compose
     profiles:
       - "hello-service"
     user: 0:0
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
   mongo:
     image: mongo:5.0.2
     restart: always
