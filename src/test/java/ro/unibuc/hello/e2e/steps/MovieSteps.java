@@ -57,7 +57,7 @@ public class MovieSteps {
     @Autowired
     private MovieRepository movieRepository;
 
-    private static final String HOST = "https://host.docker.internal:8080";
+    private static final String HOST = "http://host.docker.internal:8080";
 
     @Given("^the database is empty")
     public void setup() {
