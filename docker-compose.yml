@@ -6,6 +6,7 @@ services:
     environment:
       ENVIRONMENT_NAME: local
       MONGODB_CONECTION_URL: mongodb://root:example@mongo:27017/
+      TMDB_CONNECTION_TOKEN: ${TMDB_CONNECTION_TOKEN}
     restart: always
     profiles:
       - "hello-service"
