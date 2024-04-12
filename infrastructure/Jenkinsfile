@@ -27,15 +27,9 @@ pipeline {
             }
         }
         stage('Push image to Docker Hub') {
-            withCredentials([usernamePassword(credentialsId: 'docker_password', usernameVariable: 'DOCKER_HUB_USERNAME', passwordVariable: 'DOCKER_HUB_PASSWORD')]) {
-                sh 'echo $DOCKER_HUB_PASSWORD | docker login --username $DOCKER_HUB_USERNAME --password-stdin'
-
-                // Push the image to Docker Hub
-                sh "docker push 9999sla/hello-img:${MAJOR_VERSION}.\$((${MINOR_VERSION} + 1)).${PATCH_VERSION}"
-            }
             steps {
-                sh "docker login docker.io -u <username> -p <password>"
-                sh "docker push 9999sla/hello-img:${IMAGE_VERSION}"
+                sh "docker login docker.io -u ${DOCKER_PASSWORD_USR} -p ${DOCKER_PASSWORD_PSW}"
+                sh "docker push 9999sla/hello-img:${MAJOR_VERSION}.\$((${MINOR_VERSION} + 1)).${PATCH_VERSION}"
             }
         }
         stage('Run app') {
