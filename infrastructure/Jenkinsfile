@@ -26,6 +26,12 @@ pipeline {
                 sh "docker build -t 9999sla/hello-img:${MAJOR_VERSION}.\$((${MINOR_VERSION} + 1)).${PATCH_VERSION} ."
             }
         }
+        stage('Push image to Docker Hub') {
+            steps {
+                sh "docker login docker.io -u ${DOCKER_PASSWORD_USR} -p ${DOCKER_PASSWORD_PSW}"
+                sh "docker push 9999sla/hello-img:${MAJOR_VERSION}.\$((${MINOR_VERSION} + 1)).${PATCH_VERSION}"
+            }
+        }
         stage('Run app') {
             steps {
                 sh "IMAGE_TAG=${env.IMAGE_TAG} docker compose up -d hello mongo"
