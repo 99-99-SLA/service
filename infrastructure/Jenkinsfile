@@ -12,16 +12,6 @@ pipeline {
                 sh './gradlew clean build'
             }
         }
-        stage('Run app') {
-            steps {
-                sh "IMAGE_TAG=${env.IMAGE_TAG} docker compose up -d hello mongo"
-            }
-        }
-        stage('Test E2E') {
-            steps {
-                sh './gradlew testE2E'
-            }
-        }
         stage('Tag image') {
             steps {
                 script {
@@ -34,6 +24,16 @@ pipeline {
                 sh "git tag ${env.IMAGE_TAG}"
                 sh "git push https://$GITHUB_TOKEN@github.com/99-99-SLA/service.git ${env.IMAGE_TAG}"
                 sh "docker build -t 9999sla/hello-img:${MAJOR_VERSION}.\$((${MINOR_VERSION} + 1)).${PATCH_VERSION} ."
+            }
+        }
+        stage('Run app') {
+            steps {
+                sh "IMAGE_TAG=${env.IMAGE_TAG} docker compose up -d hello mongo"
+            }
+        }
+        stage('Test E2E') {
+            steps {
+                sh './gradlew testE2E'
             }
         }
     }
