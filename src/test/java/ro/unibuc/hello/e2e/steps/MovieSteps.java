@@ -36,7 +36,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.boot.test.context.SpringBootTest.*;
 
 @CucumberContextConfiguration
-@SpringBootTest(webEnvironment= WebEnvironment.DEFINED_PORT)
+@SpringBootTest
 public class MovieSteps {
 
     public static ResponseResults latestResponse = null;
