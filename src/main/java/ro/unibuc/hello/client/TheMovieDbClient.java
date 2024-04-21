@@ -3,6 +3,9 @@ package ro.unibuc.hello.client;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.micrometer.core.instrument.Counter;
+import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.instrument.Timer;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
@@ -19,13 +22,23 @@ import java.io.IOException;
 public class TheMovieDbClient {
     private final OkHttpClient client;
     private final ObjectMapper objectMapper;
+    private MeterRegistry meterRegistry;
+    private final Counter requestCounter;
+    private final Timer requestTimer;
 
     @Value("${tmdb.connection.token}")
     private String bearerToken;
 
-    public TheMovieDbClient() {
+
+    public TheMovieDbClient(MeterRegistry meterRegistry) {
         this.client = new OkHttpClient();
         this.objectMapper = new ObjectMapper();
+        this.requestTimer = Timer.builder("tmdb_response_time")
+                .description("Response times of tmdb service requests")
+                .register(meterRegistry);
+        this.requestCounter = Counter.builder("tmdb_request_counter")
+                .description("Total number of tmdb service requests")
+                .register(meterRegistry);
     }
 
     public PagedApiResponseDto<MovieApiDto> searchMovie(String name) {
@@ -75,18 +88,32 @@ public class TheMovieDbClient {
         }
     }
 
-    private String executeCallAndGetResponseString(Request request) {
+    public Integer healthRequestCode() throws RuntimeException {
+        final String url = "https://api.themoviedb.org/3/search/movie?query=Titanic&page=1";
+        final Request request = addHeadersToRequest(new Request.Builder().url(url).get());
+
         try (final Response response = client.newCall(request).execute()) {
-            if (response.body() == null) {
-                throw new RuntimeException("Response body is null");
-            }
-            if (response.code() == 404) {
-                throw new EntityNotFoundException("Resource not found");
-            }
-            return response.body().string();
+            return response.code();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private String executeCallAndGetResponseString(Request request) {
+        requestCounter.increment();
+        return requestTimer.record(() -> {
+            try (final Response response = client.newCall(request).execute()) {
+                if (response.body() == null) {
+                    throw new RuntimeException("Response body is null");
+                }
+                if (response.code() == 404) {
+                    throw new EntityNotFoundException("Resource not found");
+                }
+                return response.body().string();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        });
     }
 
     private Request addHeadersToRequest(Request.Builder requestBuilder) {
