@@ -18,3 +18,22 @@ groups:
         annotations:
           summary: Increased info retrieval rate {{ $labels.value}} {{ $value }}
           description: "A container has disappeared\n  VALUE = {{ $value }}\n  LABELS = {{ $labels }}"
+
+      - alert: WARNING-HighThroughput
+        expr: rate(tmdb_request_counter_total[15s]) > 4
+        for: 2s
+        labels:
+          severity: warning
+        annotations:
+          summary: Increased info retrieval rate {{ $labels.value}} {{ $value }}
+          description: "Large number of requests\n  VALUE = {{ $value }}\n  LABELS = {{ $labels }}"
+
+      - alert: CRITICAL-HighThroughput
+        expr: rate(tmdb_request_counter_total[15s]) > 20
+        for: 2s
+        labels:
+          severity: critical
+        annotations:
+          summary: Increased info retrieval rate {{ $labels.value}} {{ $value }}
+          description: "Number of requests to TMDB is close to saturation\n  VALUE = {{ $value }}\n  LABELS = {{ $labels }}"
+
